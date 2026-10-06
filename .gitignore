@@ -1,0 +1,63 @@
+# ---------------------------------------------------
+# Personal Data & Media (CRITICAL)
+# ---------------------------------------------------
+data/private/
+*.jpg
+*.jpeg
+*.png
+!data/sample/
+!*.md
+
+# ---------------------------------------------------
+# PyTorch & Machine Learning
+# ---------------------------------------------------
+# Ignore saved model weights and checkpoints
+*.pt
+*.pth
+*.ckpt
+models/weights/
+
+# Ignore output generated textures or logs
+outputs/
+logs/
+runs/
+
+# ---------------------------------------------------
+# Jupyter Notebooks
+# ---------------------------------------------------
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# ---------------------------------------------------
+# Python Core
+# ---------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ---------------------------------------------------
+# OS & IDE specifics
+# ---------------------------------------------------
+# macOS (M1 Mac)
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux / Windows
+*~
+Thumbs.db
+
+# VS Code / JetBrains
+.vscode/
+.idea/

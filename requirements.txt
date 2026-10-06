@@ -1,0 +1,18 @@
+# Core PyTorch
+torch
+torchvision
+
+# Face Recognition Models
+facenet-pytorch
+insightface
+
+# Utilities & Math
+numpy<2.0.0
+onnxruntime
+opencv-python
+pillow
+matplotlib
+
+# Notebook environment (for the notebooks/ folder)
+jupyterlab
+ipywidgets
