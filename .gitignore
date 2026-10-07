@@ -1,63 +1,26 @@
-# ---------------------------------------------------
-# Personal Data & Media (CRITICAL)
-# ---------------------------------------------------
-data/private/
-*.jpg
-*.jpeg
-*.png
-!data/sample/
-!*.md
-
-# ---------------------------------------------------
-# PyTorch & Machine Learning
-# ---------------------------------------------------
-# Ignore saved model weights and checkpoints
-*.pt
-*.pth
-*.ckpt
-models/weights/
-
-# Ignore output generated textures or logs
-outputs/
-logs/
-runs/
-
-# ---------------------------------------------------
-# Jupyter Notebooks
-# ---------------------------------------------------
-.ipynb_checkpoints/
-*/.ipynb_checkpoints/
-
-# ---------------------------------------------------
-# Python Core
-# ---------------------------------------------------
+# Environment
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-.Python
-
-# Environments
 .env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# ---------------------------------------------------
-# OS & IDE specifics
-# ---------------------------------------------------
-# macOS (M1 Mac)
 .DS_Store
-.AppleDouble
-.LSOverride
 
-# Linux / Windows
-*~
-Thumbs.db
+# Jupyter
+.ipynb_checkpoints/
 
-# VS Code / JetBrains
-.vscode/
-.idea/
+# Block all generated media and data
+*.jpg
+*.jpeg
+*.csv
+*.pdf
+*.png
+
+# EXCEPTIONS: Allow the mask template and gitkeeps
+!data/glasses_template.png
+!**/.gitkeep
+
+# Completely ignore folder contents (except gitkeeps)
+data/private/*
+!data/private/.gitkeep
+
+outputs/*
+!outputs/.gitkeep

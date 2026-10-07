@@ -30,73 +30,10 @@ Adversarial-Glasses/
 │   ├── eot.py                    # Expectation over Transformation augmentations
 │   ├── evaluate.py               # Digital simulation and live webcam testing
 │   ├── losses.py                 # Total Variation, NPS, and Cosine Dodging losses
-│   ├── models.py                 # Model wrappers (InceptionResnetV1, MTCNN)
+│   ├── models.py                 # Model wrappers (InceptionResnetV1, MTCNN, ArcFace)
 │   ├── optimize.py               # Optimization loop and batch driver
 │   └── utils.py                  # Masking routines, inpainting, and PDF rendering
 ├── .gitignore
+├── EXPERIMENTS.md                # Documentation for running physical tests
 ├── README.md
 └── requirements.txt
-```
-
----
-
-## Setup & Installation
-
-1. **Activate Environment:**
-   Ensure Conda is installed and create the project environment:
-   ```bash
-   conda activate adv_glasses
-   ```
-
-2. **Install Dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
----
-
-## Operating Instructions
-
-### 1. Data Preparation
-- Place target face images into `data/sample/` (for public testing) or `data/private/` (for personal testing).
-- Keep the transparent mask file at `data/glasses_template.png`.
-- *Note:* The repository's `.gitignore` rules prevent any media inside `data/private/` or stray image files from being tracked by Git.
-
-### 2. Generating Adversarial Glasses
-To run the optimization pipeline:
-```bash
-cd src
-python optimize.py
-```
-- The optimizer calculates joint loss (Cosine Dodging, Total Variation for smoothness, and Non-Printability Score for color realizability).
-- When optimization finishes, a high-resolution, vector-scaled PDF with cutting contours is exported to:
-  `outputs/physical_adversarial_glasses.pdf`
-
-### 3. Hyperparameter Configuration
-Modify `src/config.py` to tune the optimization dynamics:
-- `ITERATIONS`: Optimization epoch count (default: `500`).
-- `LEARNING_RATE`: Adam step size (default: `0.03`).
-- `WEIGHT_TV`: Total variation penalty weighting (controls pattern smoothness).
-- `WEIGHT_NPS`: Non-printability penalty weighting (controls printer gamut adherence).
-
-### 4. Evaluating Physical & Digital Robustness
-To run simulation validation or launch the live camera evaluation:
-```python
-# From within Python or a notebook:
-from evaluate import run_digital_validation, run_live_webcam
-
-# 1. Run Monte Carlo transformation simulations
-run_digital_validation(perturbation, mask, clean_faces)
-
-# 2. Launch the real-time webcam test with bounding box tracking
-run_live_webcam(baseline_img_path="../data/sample/target.jpg")
-```
-
----
-
-## Roadmap
-- [x] Whitebox InceptionResnetV1 optimization pipeline.
-- [x] Expectation over Transformation (EoT) environmental modeling.
-- [x] Sub-pixel boundary smoothing and 300 DPI vector PDF exporter.
-- [ ] Black-box transferability pipeline for ArcFace architectures.
-- [ ] Multi-subject ensemble optimization.

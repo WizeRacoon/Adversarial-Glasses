@@ -291,3 +291,31 @@ def run_arcface_profiling(baseline_img_path: str, frames_per_phase: int = 100):
     fig.savefig(plot_path, dpi=200)
     plt.close(fig)
     print(f"Data saved to: {csv_path}\nPlot saved to: {plot_path}")
+
+if __name__ == "__main__":
+    import argparse
+    import os
+
+    parser = argparse.ArgumentParser(description="Physical Evaluation & Profiling Suite")
+    parser.add_argument("--mode", type=str, required=True, 
+                        choices=["live", "dual", "profile"], 
+                        help="Evaluation mode to run.")
+    parser.add_argument("--baseline", type=str, default="../data/sample/target.jpg", 
+                        help="Path to your baseline reference face image.")
+    parser.add_argument("--frames", type=int, default=100, 
+                        help="Number of frames to capture per phase (for profiling).")
+
+    args = parser.parse_args()
+
+    # Ensure baseline image exists before booting models
+    if not os.path.exists(args.baseline):
+        print(f"Error: Baseline image not found at '{args.baseline}'.")
+        print("Please place a clean picture of your face there to extract the target embedding.")
+        exit(1)
+
+    if args.mode == "live":
+        run_live_webcam(args.baseline)
+    elif args.mode == "dual":
+        run_dual_live_webcam(args.baseline)
+    elif args.mode == "profile":
+        run_arcface_profiling(args.baseline, frames_per_phase=args.frames)
