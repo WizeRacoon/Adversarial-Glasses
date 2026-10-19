@@ -11,6 +11,7 @@ from PIL import Image
 from torchvision.transforms.functional import to_tensor, resize
 import torch.nn.functional as F
 
+import plotting
 import config
 from eot import EoTPipeline
 from models import load_resnet, load_mtcnn, load_arcface
@@ -192,9 +193,10 @@ def run_dual_live_webcam(baseline_img_path: str, resnet_threshold: float = 0.3, 
         cv2.destroyAllWindows()
 
 
-def run_arcface_profiling(baseline_img_path: str, frames_per_phase: int = 100):
+def run_arcface_profiling(baseline_img_path: str, frames_per_phase: int = 100, out_dir: str = None):
     """Records face coordinates and similarities across physical phases, exporting plots to outputs/."""
     device = config.DEVICE
+    out_dir = out_dir or config.OUTPUT_DIR
     _, arc_baseline, _, _, app = get_baselines(baseline_img_path, device)
     
     cap = cv2.VideoCapture(0)
@@ -248,7 +250,7 @@ def run_arcface_profiling(baseline_img_path: str, frames_per_phase: int = 100):
         cv2.destroyAllWindows()
 
     # --- Data Export & Plotting ---
-    csv_path = os.path.join(config.OUTPUT_DIR, "arcface_robustness.csv")
+    csv_path = os.path.join(out_dir, "arcface_robustness.csv")
     with open(csv_path, mode='w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['Phase', 'Frame', 'Face_Width_px', 'Center_Offset_px', 'ArcFace_Similarity'])
@@ -286,7 +288,7 @@ def run_arcface_profiling(baseline_img_path: str, frames_per_phase: int = 100):
     ax2.set_xlabel('Distance from Frame Center (Pixels)')
     ax2.legend()
 
-    plot_path = os.path.join(config.OUTPUT_DIR, "arcface_profiling_trends.png")
+    plot_path = os.path.join(out_dir, "arcface_profiling_trends.png")
     fig.tight_layout()
     fig.savefig(plot_path, dpi=200)
     plt.close(fig)
@@ -304,13 +306,14 @@ if __name__ == "__main__":
                         help="Path to your baseline reference face image.")
     parser.add_argument("--frames", type=int, default=100, 
                         help="Number of frames to capture per phase (for profiling).")
+    # Add this new argument
+    parser.add_argument("--out_dir", type=str, default="../outputs", 
+                        help="Output directory for experiment data.")
 
     args = parser.parse_args()
 
-    # Ensure baseline image exists before booting models
     if not os.path.exists(args.baseline):
         print(f"Error: Baseline image not found at '{args.baseline}'.")
-        print("Please place a clean picture of your face there to extract the target embedding.")
         exit(1)
 
     if args.mode == "live":
@@ -318,4 +321,5 @@ if __name__ == "__main__":
     elif args.mode == "dual":
         run_dual_live_webcam(args.baseline)
     elif args.mode == "profile":
-        run_arcface_profiling(args.baseline, frames_per_phase=args.frames)
+        # Pass the out_dir down to your plotting functions here if needed
+        run_arcface_profiling(args.baseline, frames_per_phase=args.frames, out_dir=args.out_dir)

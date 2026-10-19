@@ -7,9 +7,22 @@ Before running any live tests, the system needs a baseline embedding of your fac
 1. Take a clear, well-lit, frontal headshot of the subject **without** glasses.
 2. Save the image to your data directory (e.g., `data/sample/target.jpg` or `data/private/target.jpg`).
 
-## CLI Usage Modes
+## Automated Experiment Pipelines (Recommended)
 
-Navigate to the `src` directory to run the evaluation tool:
+The easiest way to run a full end-to-end experiment (optimization + evaluation + plotting) is using the unified bash runners. These scripts automatically create timestamped artifact directories in `outputs/`.
+
+```bash
+# Run from the root of the repository
+./experiments/run_dodging.sh
+```
+* **Phase 1:** Optimizes the adversarial glasses against the batched faces in your data directory.
+* **Phase 2:** Automatically launches the live ArcFace robustness profiler and saves the resulting CSV and trend plots into the timestamped experiment folder.
+
+---
+
+## Manual CLI Usage Modes
+
+If you prefer to run evaluation modules individually, navigate to the `src` directory:
 ```bash
 cd src
 ```
@@ -32,13 +45,8 @@ python evaluate.py --mode dual --baseline ../data/sample/target.jpg
 An automated data collection sequence for generating academic plots. This mode records similarity scores alongside bounding box size (distance from camera) and X-axis offset (panning angle) across three distinct physical phases: *No Glasses*, *Black Glasses*, and *Adversarial Glasses*.
 
 ```bash
-python evaluate.py --mode profile --baseline ../data/sample/target.jpg --frames 100
+python evaluate.py --mode profile --baseline ../data/sample/target.jpg --frames 100 --out_dir ../outputs
 ```
-**Experiment Workflow:**
-1. The script will prompt you to step into the frame without glasses. Press `SPACE` to begin recording.
-2. It will capture the specified number of frames (default: 100), recording distance, angle, and similarity metrics.
-3. It will automatically prompt you to swap to the next phase (Black Glasses, then Adversarial).
-4. **Outputs:** Upon completion, the script exports a raw `.csv` dataset and quadratic curve trend plots to the `outputs/` directory.
 
 ### Digital Simulation Validation (Notebook Integration)
 If you wish to run Monte Carlo simulations (Expectation over Transformation) without physical printing, you can import the validation module directly into your Jupyter notebooks or custom scripts:

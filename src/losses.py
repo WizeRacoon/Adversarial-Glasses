@@ -1,5 +1,15 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+
+def cosine_dodging_loss(adv_embeddings: torch.Tensor, baseline_embeddings: torch.Tensor) -> torch.Tensor:
+    """Dodging: Maximize distance from the true identity."""
+    return F.cosine_similarity(adv_embeddings, baseline_embeddings).mean()
+
+def cosine_impersonation_loss(adv_embeddings: torch.Tensor, target_embeddings: torch.Tensor) -> torch.Tensor:
+    """Impersonation: Minimize distance to the victim's identity."""
+    # 1.0 - similarity means as similarity approaches 1 (perfect match), loss approaches 0
+    return (1.0 - F.cosine_similarity(adv_embeddings, target_embeddings)).mean()
 
 class TotalVariationLoss(nn.Module):
     def __init__(self):
@@ -25,8 +35,3 @@ def non_printability_score(perturbation: torch.Tensor, mask: torch.Tensor, color
     dists = torch.sum((perturbation - colors)**2, dim=1)
     nps_map = torch.prod(dists, dim=0)
     return torch.sum(nps_map * mask[:, 0, :, :])
-
-def cosine_dodging_loss(embeddings1: torch.Tensor, embeddings2: torch.Tensor) -> torch.Tensor:
-    # We want to maximize distance, so we maximize cosine similarity (push it toward -1)
-    cos = nn.CosineSimilarity(dim=1, eps=1e-6)
-    return cos(embeddings1, embeddings2).mean()
