@@ -91,7 +91,7 @@ The framework includes a comprehensive CLI tool for testing digital robustness a
 
 ---
 
-## Roadmap / Accomplishments
+## Roadmap, Accomplishments and Future Work
 - [x] Whitebox InceptionResnetV1 optimization pipeline.
 - [x] Expectation over Transformation (EoT) environmental modeling.
 - [x] Sub-pixel boundary smoothing and 300 DPI vector PDF exporter.
