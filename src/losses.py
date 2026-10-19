@@ -6,11 +6,6 @@ def cosine_dodging_loss(adv_embeddings: torch.Tensor, baseline_embeddings: torch
     """Dodging: Maximize distance from the true identity."""
     return F.cosine_similarity(adv_embeddings, baseline_embeddings).mean()
 
-def cosine_impersonation_loss(adv_embeddings: torch.Tensor, target_embeddings: torch.Tensor) -> torch.Tensor:
-    """Impersonation: Minimize distance to the victim's identity."""
-    # 1.0 - similarity means as similarity approaches 1 (perfect match), loss approaches 0
-    return (1.0 - F.cosine_similarity(adv_embeddings, target_embeddings)).mean()
-
 class TotalVariationLoss(nn.Module):
     def __init__(self):
         super().__init__()

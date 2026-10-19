@@ -7,7 +7,7 @@ from PIL import Image, ImageOps
 import config
 from utils import load_glasses_mask, save_smoothed_pdf
 from eot import EoTPipeline
-from losses import TotalVariationLoss, non_printability_score, cosine_dodging_loss, cosine_impersonation_loss
+from losses import TotalVariationLoss, non_printability_score, cosine_dodging_loss
 from models import load_resnet, load_mtcnn
 
 def load_face_batch(data_dir: str, device: torch.device) -> torch.Tensor:
@@ -39,10 +39,10 @@ def load_face_batch(data_dir: str, device: torch.device) -> torch.Tensor:
 def main():
     # --- COMMAND PATTERN ---
     parser = argparse.ArgumentParser(description="Optimize Adversarial Glasses")
-    parser.add_argument("--attack", type=str, choices=["dodging", "impersonation"], default="dodging",
+    parser.add_argument("--attack", type=str, default="dodging",
                         help="The objective of the adversarial attack.")
-    parser.add_argument("--target_dir", type=str, default="",
-                        help="Path to target identity faces (required for impersonation).")
+    parser.add_argument("--data_dir", type=str, default=config.DATA_DIR,
+                        help="Override default data directory for batch images.")
     parser.add_argument("--out_dir", type=str, default=config.OUTPUT_DIR,
                         help="Override default output directory for experiment tracking.")
     args = parser.parse_args()
@@ -61,19 +61,11 @@ def main():
     ]).to(config.DEVICE)
 
     # 2. Load Batch Data & Baselines
-    clean_faces = load_face_batch(config.DATA_DIR, config.DEVICE)
+    clean_faces = load_face_batch(args.data_dir, config.DEVICE)
+    print(f"Successfully loaded and aligned {clean_faces.shape[0]} faces in the batch.") # Add this line
+    
     with torch.no_grad():
         baseline_embeddings = resnet(clean_faces).mean(dim=0, keepdim=True)
-    
-    # --- DISPATCH PREPARATION ---
-    target_embeddings = None
-    if args.attack == "impersonation":
-        if not os.path.exists(args.target_dir):
-            raise ValueError("Impersonation requires a valid --target_dir containing the victim's faces.")
-        target_faces = load_face_batch(args.target_dir, config.DEVICE)
-        with torch.no_grad():
-            # Average the target's embeddings to create a stable anchor point
-            target_embeddings = resnet(target_faces).mean(dim=0, keepdim=True)
 
     # 3. Initialize Perturbation and Mask
     mask = load_glasses_mask(config.MASK_TEMPLATE_PATH, config.DEVICE)
@@ -89,11 +81,7 @@ def main():
         adv_faces_transformed = eot(adv_faces)
         adv_embeddings = resnet(adv_faces_transformed)
         
-        # --- LOSS ROUTING DISPATCH ---
-        if args.attack == "dodging":
-            loss_attack = cosine_dodging_loss(adv_embeddings, baseline_embeddings)
-        elif args.attack == "impersonation":
-            loss_attack = cosine_impersonation_loss(adv_embeddings, target_embeddings)
+        loss_attack = cosine_dodging_loss(adv_embeddings, baseline_embeddings)
             
         loss_tv = tv_loss_fn(perturbation, mask)
         loss_nps = non_printability_score(perturbation, mask, printable_colors)

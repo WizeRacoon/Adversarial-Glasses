@@ -206,9 +206,14 @@ def run_arcface_profiling(baseline_img_path: str, frames_per_phase: int = 100, o
     phases = ['No Glasses', 'Black Glasses', 'Adversarial Glasses']
     arc_recorded_data = {phase: [] for phase in phases}
 
-    print("Starting ArcFace Robustness Profiling.")
+    print("Starting ArcFace Robustness Profiling. Press 'q' in the window at any time to abort.")
+    
+    abort = False
     try:
         for phase in phases:
+            if abort:
+                break
+                
             print(f"\n--- Phase: {phase} ---")
             recording = False
             frame_count = 0
@@ -233,18 +238,28 @@ def run_arcface_profiling(baseline_img_path: str, frames_per_phase: int = 100, o
                         frame_count += 1
                         arc_recorded_data[phase].append((frame_count, face_size_px, offset_x, similarity))
                         cv2.putText(frame, f"RECORDING {phase}... {frame_count}/{frames_per_phase}", (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                        cv2.putText(frame, "Press 'q' to Abort", (30, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                        
                         if frame_count >= frames_per_phase:
                             break
                     else:
                         cv2.putText(frame, f"Put on: {phase}", (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
                         cv2.putText(frame, "Press SPACE to Record", (30, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (200, 200, 200), 2)
+                        cv2.putText(frame, "Press 'q' to Quit", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                         
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 165, 255), 2)
                 
                 cv2.imshow('ArcFace Profiling', frame)
-                if cv2.waitKey(1) & 0xFF == ord(' '):
+                
+                # Check for key presses
+                key = cv2.waitKey(1) & 0xFF
+                if key == ord(' '):
                     recording = True
                     print(f"Recording {phase} started! Move around slowly...")
+                elif key == ord('q'):
+                    print("Profiling interrupted by user. Exporting collected data...")
+                    abort = True
+                    break
     finally:
         cap.release()
         cv2.destroyAllWindows()
@@ -263,7 +278,7 @@ def run_arcface_profiling(baseline_img_path: str, frames_per_phase: int = 100, o
     fig.suptitle('Black-Box Physical Robustness Boundaries (ArcFace)', fontsize=16)
 
     for phase in phases:
-        if arc_recorded_data[phase]:
+        if arc_recorded_data[phase]:  # This prevents crashes if you quit before recording a phase
             _, sizes, offsets, sims = zip(*arc_recorded_data[phase])
             sizes, offsets, sims = np.array(sizes), np.array(offsets), np.array(sims)
             
