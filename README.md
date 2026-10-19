@@ -4,16 +4,16 @@ This repository serves as the codebase for an MSc research project focusing on p
 
 The repository provides a complete, differentiable pipeline for optimizing printable adversarial textures. It actively integrates Expectation over Transformation (EoT), Total Variation (TV) constraints, and a Non-Printability Score (NPS) to bridge the digital-to-physical performance gap.
 
-**Current Scope & Active Development**
-The primary focus of this internship is establishing a highly robust framework for **dodging** (untargeted evasion). The pipeline is currently being polished and expanded to maximize real-world physical robustness through:
-- **Subject-Specific Robustness:** Implementing multi-image batching across diverse lighting conditions and poses to prevent spatial overfitting.
-- **Ensemble-Based Optimization:** Structuring the pipeline to compute joint objective functions across both Euclidean (InceptionResnetV1) and Additive Angular Margin (ArcFace) architectures.
+**Current Scope & Completed Objectives**
+The primary focus of this internship was establishing a highly robust framework for **dodging** (untargeted evasion). The pipeline maximizes real-world physical robustness through:
+- **Subject-Specific Robustness:** Implemented multi-image batching across diverse lighting conditions and poses to prevent spatial overfitting and ensure reliable evasion in the physical domain.
 
 **Future Research Directions**
-The codebase utilizes a Command & Dispatch architecture, leaving a highly modular foundation for future students and subsequent projects to explore:
-- Targeted Impersonation Attacks (Initial loss functions provided).
-- Hardware Fluctuations and Morphological Impact (e.g., varying frame surface areas).
-- Defensive Countermeasures and Mitigation.
+The codebase utilizes a modular Command & Dispatch architecture, leaving a structured foundation for future students and subsequent internships to explore:
+- **Ensemble-Based Optimization:** Integrating the black-box transferability module directly into the training loop via a PyTorch-native ArcFace implementation to generate universal perturbations capable of simultaneous cross-architecture evasion.
+- **Targeted Impersonation Attacks:** (Initial loss routing provided).
+- **Hardware Fluctuations and Morphological Impact:** (e.g., varying frame surface areas).
+- **Defensive Countermeasures and Mitigation.**
 
 ## Repository Structure
 
@@ -24,7 +24,8 @@ Adversarial-Glasses/
 │   ├── private/                  # Personal evaluation faces (IGNORED by Git)
 │   └── glasses_template.png      # High-contrast RGBA eyeglass silhouette
 ├── experiments/                  # Unified bash runners for standardized testing
-│   └── run_dodging.sh            
+│   ├── run_dodging.sh            
+│   └── run_batch_dodging.sh            
 ├── notebooks/                    # Prototyping and custom exploratory analyses
 ├── outputs/                      # Generated PDFs, evaluation plots, and textures
 ├── src/
@@ -71,7 +72,7 @@ Adversarial-Glasses/
 To run the optimization pipeline manually:
 ```bash
 cd src
-python optimize.py --attack dodging
+python optimize.py --attack dodging --data_dir ../data/private/my_dataset
 ```
 - The optimizer calculates joint loss (Cosine Dodging, Total Variation for smoothness, and Non-Printability Score for color realizability) across all batched faces simultaneously.
 - When optimization finishes, a high-resolution, vector-scaled PDF with cutting contours is exported to the outputs directory.
@@ -90,10 +91,14 @@ The framework includes a comprehensive CLI tool for testing digital robustness a
 
 ---
 
-## Roadmap
+## Roadmap / Accomplishments
 - [x] Whitebox InceptionResnetV1 optimization pipeline.
 - [x] Expectation over Transformation (EoT) environmental modeling.
 - [x] Sub-pixel boundary smoothing and 300 DPI vector PDF exporter.
 - [x] Black-box transferability pipeline for ArcFace architectures.
-- [x] Multi-subject / Multi-image spatial batching optimization.
-- [ ] PyTorch-native ArcFace integration for joint-objective Ensemble Optimization.
+- [x] Subject-Specific Robustness via Multi-Image Batching optimization.
+- [ ] *Future Work:* Targeted Impersonation Attacks (transitioning from general dodging to targeting a specific identity's embedding).
+- [ ] *Future Work:* Ensemble-Based Optimization (PyTorch-native ArcFace integration for joint-objective cross-architecture transferability).
+- [ ] *Future Work:* Hardware Fluctuations and Morphological Impact (varying camera sensors, ISPs, capture angles, and frame surface areas).
+- [ ] *Future Work:* Deconstructing the Digital-to-Physical Delta (analyzing printer gamut clipping, ambient color temperature, and hardware smoothing).
+- [ ] *Future Work:* Defensive Countermeasures and Mitigation (anomaly detection and adversarial training).
