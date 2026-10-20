@@ -8,7 +8,7 @@ The repository provides a complete, differentiable pipeline for optimizing print
 The primary focus of this internship was establishing a robust framework for **dodging** (untargeted evasion). The pipeline tries to maximize real-world physical robustness through implemented multi-image batching across diverse lighting conditions and poses to prevent spatial overfitting and ensure reliable evasion in the physical domain.
 
 **Future Research Directions**
-The codebase utilizes a modular Command & Dispatch architecture, leaving a structured foundation for future students and subsequent internships to explore. Additionally, all code has been written with potential future prospects in mind, meaning clear naming, documentation and seperation of concerns. See the section "Roadmap, Accomplishments and Future Work" at the bottom of this README.
+The codebase utilizes a modular Command & Dispatch architecture, leaving a structured foundation for future students and subsequent internships to explore. Additionally, all code has been written with potential future prospects in mind, meaning clear naming, documentation and seperation of concerns.
 
 ## Repository Structure
 
@@ -23,8 +23,13 @@ Adversarial-Glasses/
 │   └── run_experiment_2.sh            
 ├── notebooks/                    # Prototyping and custom exploratory analyses
 ├── outputs/                      # Timestamped experiment logs
-│   ├── experiment_1/
-│   └── experiment_2/
+├── outputs/                      # Timestamped experiment logs
+│   ├── experiment_20261020_1530/
+│   │   ├── dodging_glasses.pdf       # 300 DPI Transparent Vector Export
+│   │   ├── experiment_meta.json      # Hyperparameter logs
+│   │   ├── raw_perturbation.pt       # PyTorch tensor for digital re-simulations
+│   │   └── resnet_robustness_boundaries.png
+│   └── ...
 ├── src/
 │   ├── config.py                 # Pipeline hyperparameters and constants
 │   ├── eot.py                    # Expectation over Transformation augmentations
