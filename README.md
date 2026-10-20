@@ -8,7 +8,7 @@ The repository provides a complete, differentiable pipeline for optimizing print
 The primary focus of this internship was establishing a robust framework for **dodging** (untargeted evasion). The pipeline tries to maximize real-world physical robustness through implemented multi-image batching across diverse lighting conditions and poses to prevent spatial overfitting and ensure reliable evasion in the physical domain.
 
 **Future Research Directions**
-The codebase utilizes a modular Command & Dispatch architecture, leaving a structured foundation for future students and subsequent internships to explore. Additionally, all code has been written with potential future prospects in mind, meaning clear naming, documentation and seperation of concerns.
+The codebase utilizes a modular Command & Dispatch architecture, leaving a structured foundation for future students and subsequent internships to explore. Additionally, all code has been written with potential future prospects in mind, meaning clear naming, documentation and seperation of concerns. See the section "Roadmap, Accomplishments and Future Work" at the bottom of this README.
 
 ## Repository Structure
 
