@@ -5,15 +5,10 @@ This repository serves as the codebase for an MSc research project focusing on p
 The repository provides a complete, differentiable pipeline for optimizing printable adversarial textures. It actively integrates Expectation over Transformation (EoT), Total Variation (TV) constraints, and a Non-Printability Score (NPS) to bridge the digital-to-physical performance gap.
 
 **Current Scope & Completed Objectives**
-The primary focus of this internship was establishing a highly robust framework for **dodging** (untargeted evasion). The pipeline maximizes real-world physical robustness through:
-- **Subject-Specific Robustness:** Implemented multi-image batching across diverse lighting conditions and poses to prevent spatial overfitting and ensure reliable evasion in the physical domain.
+The primary focus of this internship was establishing a robust framework for **dodging** (untargeted evasion). The pipeline tries to maximize real-world physical robustness through implemented multi-image batching across diverse lighting conditions and poses to prevent spatial overfitting and ensure reliable evasion in the physical domain.
 
 **Future Research Directions**
-The codebase utilizes a modular Command & Dispatch architecture, leaving a structured foundation for future students and subsequent internships to explore:
-- **Ensemble-Based Optimization:** Integrating the black-box transferability module directly into the training loop via a PyTorch-native ArcFace implementation to generate universal perturbations capable of simultaneous cross-architecture evasion.
-- **Targeted Impersonation Attacks:** (Initial loss routing provided).
-- **Hardware Fluctuations and Morphological Impact:** (e.g., varying frame surface areas).
-- **Defensive Countermeasures and Mitigation.**
+The codebase utilizes a modular Command & Dispatch architecture, leaving a structured foundation for future students and subsequent internships to explore. Additionally, all code has been written with potential future prospects in mind, meaning clear naming, documentation and seperation of concerns.
 
 ## Repository Structure
 
@@ -50,8 +45,9 @@ Adversarial-Glasses/
 ## Setup & Installation
 
 1. **Activate Environment:**
-   Ensure Conda is installed and create the project environment:
+   Ensure Conda is installed and create the project environment (Python 3.10+ recommended):
    ```bash
+   conda create -n adv_glasses python=3.10
    conda activate adv_glasses
    ```
 
@@ -59,6 +55,12 @@ Adversarial-Glasses/
    ```bash
    pip install -r requirements.txt
    ```
+
+> **Note on InsightFace Installation (`insightface`):**  
+> InsightFace requires compiling C++ extensions, which can sometimes fail depending on your OS.
+> * **Windows Users:** If you get a `Failed building wheel` error, you either need to install [Visual Studio C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/), or manually install a pre-compiled wheel (e.g., `pip install insightface-0.7.3-cp310-cp310-win_amd64.whl`).
+> * **macOS (Apple Silicon / M1/M2) Users:** If the build fails, it is usually because it cannot find the NumPy headers. Run this before installing:  
+>   `export CFLAGS="-I$(python -c 'import numpy; print(numpy.get_include())')"`
 
 ---
 
