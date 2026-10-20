@@ -101,5 +101,21 @@ def main():
     pdf_path = os.path.join(args.out_dir, f"{args.attack}_glasses.pdf")
     save_smoothed_pdf(perturbation, mask, pdf_path)
 
+    # Save raw tensor
+    torch.save(perturbation.detach().cpu(), os.path.join(args.out_dir, "raw_perturbation.pt"))
+    
+    # Save hyperparameter metadata
+    import json
+    meta = {
+        "attack_type": args.attack,
+        "iterations": config.ITERATIONS,
+        "learning_rate": config.LEARNING_RATE,
+        "weight_tv": config.WEIGHT_TV,
+        "weight_nps": config.WEIGHT_NPS,
+        "batch_size": clean_faces.shape[0]
+    }
+    with open(os.path.join(args.out_dir, "experiment_meta.json"), "w") as f:
+        json.dump(meta, f, indent=4)
+
 if __name__ == "__main__":
     main()

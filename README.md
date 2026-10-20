@@ -24,10 +24,12 @@ Adversarial-Glasses/
 │   ├── private/                  # Personal evaluation faces (IGNORED by Git)
 │   └── glasses_template.png      # High-contrast RGBA eyeglass silhouette
 ├── experiments/                  # Unified bash runners for standardized testing
-│   ├── run_dodging.sh            
-│   └── run_batch_dodging.sh            
+│   ├── run_experiment_1.sh            
+│   └── run_experiment_2.sh            
 ├── notebooks/                    # Prototyping and custom exploratory analyses
-├── outputs/                      # Generated PDFs, evaluation plots, and textures
+├── outputs/                      # Timestamped experiment logs
+│   ├── experiment_1/
+│   └── experiment_2/
 ├── src/
 │   ├── config.py                 # Pipeline hyperparameters and constants
 │   ├── eot.py                    # Expectation over Transformation augmentations

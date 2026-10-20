@@ -36,7 +36,7 @@ def load_glasses_mask(template_path: str, device: torch.device) -> torch.Tensor:
     return mask.unsqueeze(0).to(device)
 
 def save_smoothed_pdf(perturbation: torch.Tensor, mask: torch.Tensor, output_path: str):
-    """Upscales, smooths, and saves the adversarial pattern as a printable PDF."""
+    """Upscales, smooths, and saves the adversarial pattern as a printable PDF with a transparent background."""
     final_pattern = np.ascontiguousarray(
         (perturbation * mask).squeeze(0).permute(1, 2, 0).detach().cpu().numpy()
     )
@@ -66,12 +66,14 @@ def save_smoothed_pdf(perturbation: torch.Tensor, mask: torch.Tensor, output_pat
     blurred_mask = cv2.GaussianBlur(hr_binary, (ksize, ksize), sigma)
     hr_mask = np.clip((blurred_mask - 0.48) / 0.04, 0.0, 1.0)[..., None]
 
-    white_bg = np.ones_like(hr_pattern)
-    printable_glasses = hr_pattern * hr_mask + white_bg * (1.0 - hr_mask)
+    # Combine RGB pattern with Alpha mask to create an RGBA image instead of a white background
+    printable_glasses = np.concatenate([hr_pattern, hr_mask], axis=-1)
 
     contour_mask = (hr_mask.squeeze() > 0.5).astype(np.uint8) * 255
     contours, _ = cv2.findContours(contour_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    cv2.drawContours(printable_glasses, contours, -1, (0.75, 0.75, 0.75), thickness=2, lineType=cv2.LINE_AA)
+    
+    # Draw contour using an RGBA color tuple (R, G, B, Alpha)
+    cv2.drawContours(printable_glasses, contours, -1, (0.75, 0.75, 0.75, 1.0), thickness=2, lineType=cv2.LINE_AA)
 
     target_width_cm = 14.50
     width_inch = target_width_cm / 2.54
@@ -83,6 +85,7 @@ def save_smoothed_pdf(perturbation: torch.Tensor, mask: torch.Tensor, output_pat
     ax.axis('off')
     ax.imshow(printable_glasses)
 
-    plt.savefig(output_path, format='pdf', pad_inches=0, dpi=300)
+    # Added transparent=True to preserve the RGBA background in the final export
+    plt.savefig(output_path, format='pdf', pad_inches=0, dpi=300, transparent=True)
     plt.close(fig)
     print(f"Physical export saved to: {output_path}")

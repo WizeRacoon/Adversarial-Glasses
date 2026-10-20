@@ -35,18 +35,26 @@ python evaluate.py --mode live --baseline ../data/sample/target.jpg
 ```
 
 ### 2. Black-Box Transferability Test (`dual`)
-Evaluates transferability by running two FRS architectures simultaneously on the live feed. It tracks the ResNet similarity score alongside the ArcFace similarity score to determine if the attack transfers to an unseen feature space.
+Evaluates transferability by running two FRS architectures simultaneously on the live feed. It tracks the ResNet similarity score alongside the ArcFace similarity score in real-time to determine if the attack transfers to an unseen feature space.
 
 ```bash
 python evaluate.py --mode dual --baseline ../data/sample/target.jpg
 ```
 
-### 3. Quantitative Robustness Profiling (`profile`)
-An automated data collection sequence for generating academic plots. This mode records similarity scores alongside bounding box size (distance from camera) and X-axis offset (panning angle) across three distinct physical phases: *No Glasses*, *Black Glasses*, and *Adversarial Glasses*.
+### 3. Quantitative Dual-Architecture Profiling (`profile`)
+An automated data collection sequence for generating academic plots. This mode records similarities for **both** ResNet and ArcFace simultaneously alongside bounding box size (distance) and X-axis offset (angle) across three distinct physical phases: *No Glasses*, *Black Glasses*, and *Adversarial Glasses*.
 
 ```bash
-python evaluate.py --mode profile --baseline ../data/sample/target.jpg --frames 100 --out_dir ../outputs
+python evaluate.py --mode profile --baseline ../data/sample/target.jpg --out_dir ../outputs
 ```
+**Interactive UI Controls:**
+When the profiling window opens, you can use the following keys before recording each phase:
+* **`+` / `=`**: Increase the number of frames to record.
+* **`-`**: Decrease the number of frames (useful for quick functionality tests).
+* **`SPACE`**: Start recording the current phase.
+* **`q`**: Abort the evaluation early (safely exports any data collected up to that point).
+
+The script automatically exports `dual_robustness.csv`, `resnet_robustness_boundaries.png`, and `arcface_robustness_boundaries.png` to your output directory.
 
 ### Digital Simulation Validation (Notebook Integration)
 If you wish to run Monte Carlo simulations (Expectation over Transformation) without physical printing, you can import the validation module directly into your Jupyter notebooks or custom scripts:

@@ -1,4 +1,3 @@
-# src/evaluate.py
 import os
 import cv2
 import torch
@@ -193,26 +192,27 @@ def run_dual_live_webcam(baseline_img_path: str, resnet_threshold: float = 0.3, 
         cv2.destroyAllWindows()
 
 
-def run_arcface_profiling(baseline_img_path: str, frames_per_phase: int = 100, out_dir: str = None):
-    """Records face coordinates and similarities across physical phases, exporting plots to outputs/."""
+def run_physical_profiling(baseline_img_path: str, frames_per_phase: int = 100, out_dir: str = None):
+    """Records face coordinates and dual-model similarities across physical phases."""
     device = config.DEVICE
     out_dir = out_dir or config.OUTPUT_DIR
-    _, arc_baseline, _, _, app = get_baselines(baseline_img_path, device)
+    resnet_baseline, arc_baseline, mtcnn, resnet, app = get_baselines(baseline_img_path, device)
     
     cap = cv2.VideoCapture(0)
     frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     frame_center_x = frame_width / 2
 
     phases = ['No Glasses', 'Black Glasses', 'Adversarial Glasses']
-    arc_recorded_data = {phase: [] for phase in phases}
+    recorded_data = {phase: [] for phase in phases}
 
-    print("Starting ArcFace Robustness Profiling. Press 'q' in the window at any time to abort.")
+    current_target_frames = frames_per_phase
+
+    print("Starting Dual-Architecture Profiling. Press 'q' in the window at any time to abort.")
     
     abort = False
     try:
         for phase in phases:
-            if abort:
-                break
+            if abort: break
                 
             print(f"\n--- Phase: {phase} ---")
             recording = False
@@ -222,6 +222,9 @@ def run_arcface_profiling(baseline_img_path: str, frames_per_phase: int = 100, o
                 ret, frame = cap.read()
                 if not ret: break
                 
+                arc_sim, res_sim, face_size_px, offset_x = None, None, None, None
+                
+                # 1. ArcFace Evaluation
                 arc_faces = app.get(frame)
                 if arc_faces:
                     bbox = arc_faces[0].bbox.astype(int)
@@ -232,82 +235,116 @@ def run_arcface_profiling(baseline_img_path: str, frames_per_phase: int = 100, o
                     
                     live_arc_emb = arc_faces[0].embedding
                     live_arc_emb = live_arc_emb / np.linalg.norm(live_arc_emb)
-                    similarity = float(np.dot(live_arc_emb, arc_baseline))
+                    arc_sim = float(np.dot(live_arc_emb, arc_baseline))
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 165, 255), 2)
                     
-                    if recording:
+                # 2. ResNet Evaluation
+                rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                pil_img = Image.fromarray(rgb_frame)
+                face_tensor, prob = mtcnn(pil_img, return_prob=True)
+                
+                if face_tensor is not None and prob > 0.90:
+                    live_face = (face_tensor.unsqueeze(0).to(device) / 255.0).clamp(0, 1)
+                    with torch.no_grad():
+                        live_embedding = resnet(live_face)
+                        res_sim = F.cosine_similarity(live_embedding, resnet_baseline).item()
+
+                if recording:
+                    if arc_sim is not None and res_sim is not None:
                         frame_count += 1
-                        arc_recorded_data[phase].append((frame_count, face_size_px, offset_x, similarity))
-                        cv2.putText(frame, f"RECORDING {phase}... {frame_count}/{frames_per_phase}", (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                        cv2.putText(frame, "Press 'q' to Abort", (30, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                        recorded_data[phase].append((frame_count, face_size_px, offset_x, arc_sim, res_sim))
                         
-                        if frame_count >= frames_per_phase:
+                        cv2.putText(frame, f"RECORDING {phase}... {frame_count}/{current_target_frames}", 
+                                    (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                        cv2.putText(frame, f"ResNet: {res_sim:.2f} | Arc: {arc_sim:.2f}", 
+                                    (30, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (200, 200, 200), 2)
+                        
+                        if frame_count >= current_target_frames:
                             break
                     else:
-                        cv2.putText(frame, f"Put on: {phase}", (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
-                        cv2.putText(frame, "Press SPACE to Record", (30, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (200, 200, 200), 2)
-                        cv2.putText(frame, "Press 'q' to Quit", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                        cv2.putText(frame, "Waiting for face detection...", (30, 40), 
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                else:
+                    # Pre-recording UI with Live Adjustments
+                    cv2.putText(frame, f"Put on: {phase}", (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+                    cv2.putText(frame, f"Frames: {current_target_frames} (Press +/- to adjust)", (30, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+                    cv2.putText(frame, "Press SPACE to Record", (30, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (200, 200, 200), 2)
+                    cv2.putText(frame, "Press 'q' to Quit", (30, 130), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                         
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 165, 255), 2)
+                cv2.imshow('Dual-Architecture Profiling', frame)
                 
-                cv2.imshow('ArcFace Profiling', frame)
-                
-                # Check for key presses
                 key = cv2.waitKey(1) & 0xFF
                 if key == ord(' '):
                     recording = True
-                    print(f"Recording {phase} started! Move around slowly...")
+                    print(f"Recording {phase} started! Target: {current_target_frames} frames.")
                 elif key == ord('q'):
                     print("Profiling interrupted by user. Exporting collected data...")
                     abort = True
                     break
+                elif not recording:
+                    # Adjust frames live
+                    if key == ord('=') or key == ord('+'):
+                        current_target_frames += 10
+                    elif key == ord('-') and current_target_frames > 10:
+                        current_target_frames -= 10
     finally:
         cap.release()
         cv2.destroyAllWindows()
 
-    # --- Data Export & Plotting ---
-    csv_path = os.path.join(out_dir, "arcface_robustness.csv")
+    # --- Data Export ---
+    csv_path = os.path.join(out_dir, "dual_robustness.csv")
     with open(csv_path, mode='w', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(['Phase', 'Frame', 'Face_Width_px', 'Center_Offset_px', 'ArcFace_Similarity'])
+        writer.writerow(['Phase', 'Frame', 'Face_Width_px', 'Center_Offset_px', 'ArcFace_Similarity', 'ResNet_Similarity'])
         for phase in phases:
-            for row in arc_recorded_data[phase]:
+            for row in recorded_data[phase]:
                 writer.writerow([phase] + list(row))
 
-    colors = {'No Glasses': 'blue', 'Black Glasses': 'orange', 'Adversarial Glasses': 'red'}
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
-    fig.suptitle('Black-Box Physical Robustness Boundaries (ArcFace)', fontsize=16)
+    # --- Plotting Helper ---
+    def plot_model_trends(model_name, threshold, sim_idx, output_filename):
+        colors = {'No Glasses': 'blue', 'Black Glasses': 'orange', 'Adversarial Glasses': 'red'}
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+        fig.suptitle(f'Physical Robustness Boundaries ({model_name})', fontsize=16)
 
-    for phase in phases:
-        if arc_recorded_data[phase]:  # This prevents crashes if you quit before recording a phase
-            _, sizes, offsets, sims = zip(*arc_recorded_data[phase])
-            sizes, offsets, sims = np.array(sizes), np.array(offsets), np.array(sims)
-            
-            ax1.scatter(sizes, sims, alpha=0.25, color=colors[phase], edgecolors='none')
-            ax2.scatter(offsets, sims, alpha=0.25, color=colors[phase], edgecolors='none')
-            
-            idx_sizes = np.argsort(sizes)
-            p_size = np.poly1d(np.polyfit(sizes, sims, 2))
-            ax1.plot(sizes[idx_sizes], p_size(sizes[idx_sizes]), color=colors[phase], linewidth=2, label=phase)
-            
-            idx_offsets = np.argsort(offsets)
-            p_offset = np.poly1d(np.polyfit(offsets, sims, 2))
-            ax2.plot(offsets[idx_offsets], p_offset(offsets[idx_offsets]), color=colors[phase], linewidth=2, label=phase)
+        for phase in phases:
+            if recorded_data[phase]:
+                data = list(zip(*recorded_data[phase]))
+                sizes = np.array(data[1])
+                offsets = np.array(data[2])
+                sims = np.array(data[sim_idx])  # Index 3 for ArcFace, 4 for ResNet
+                
+                ax1.scatter(sizes, sims, alpha=0.25, color=colors[phase], edgecolors='none')
+                ax2.scatter(offsets, sims, alpha=0.25, color=colors[phase], edgecolors='none')
+                
+                idx_sizes = np.argsort(sizes)
+                p_size = np.poly1d(np.polyfit(sizes, sims, 2))
+                ax1.plot(sizes[idx_sizes], p_size(sizes[idx_sizes]), color=colors[phase], linewidth=2, label=phase)
+                
+                idx_offsets = np.argsort(offsets)
+                p_offset = np.poly1d(np.polyfit(offsets, sims, 2))
+                ax2.plot(offsets[idx_offsets], p_offset(offsets[idx_offsets]), color=colors[phase], linewidth=2, label=phase)
 
-    threshold = 0.4
-    ax1.axhline(y=threshold, color='k', linestyle='--', label='Detection Threshold')
-    ax1.set_xlabel('Face Bounding Box Width (Pixels)')
-    ax1.set_ylabel('Cosine Similarity (ArcFace)')
-    ax1.legend()
+        ax1.axhline(y=threshold, color='k', linestyle='--', label='Detection Threshold')
+        ax1.set_xlabel('Face Bounding Box Width (Pixels)')
+        ax1.set_ylabel(f'Cosine Similarity ({model_name})')
+        ax1.legend()
 
-    ax2.axhline(y=threshold, color='k', linestyle='--', label='Detection Threshold')
-    ax2.set_xlabel('Distance from Frame Center (Pixels)')
-    ax2.legend()
+        ax2.axhline(y=threshold, color='k', linestyle='--', label='Detection Threshold')
+        ax2.set_xlabel('Distance from Frame Center (Pixels)')
+        ax2.legend()
 
-    plot_path = os.path.join(out_dir, "arcface_profiling_trends.png")
-    fig.tight_layout()
-    fig.savefig(plot_path, dpi=200)
-    plt.close(fig)
-    print(f"Data saved to: {csv_path}\nPlot saved to: {plot_path}")
+        plot_path = os.path.join(out_dir, output_filename)
+        fig.tight_layout()
+        fig.savefig(plot_path, dpi=200)
+        plt.close(fig)
+        return plot_path
+
+    # Generate both plots
+    arc_path = plot_model_trends("ArcFace", 0.4, 3, "arcface_robustness_boundaries.png")
+    res_path = plot_model_trends("ResNet", 0.3, 4, "resnet_robustness_boundaries.png")
+    
+    print(f"Data saved to: {csv_path}")
+    print(f"Plots saved to: {arc_path} and {res_path}")
 
 if __name__ == "__main__":
     import argparse
@@ -321,7 +358,6 @@ if __name__ == "__main__":
                         help="Path to your baseline reference face image.")
     parser.add_argument("--frames", type=int, default=100, 
                         help="Number of frames to capture per phase (for profiling).")
-    # Add this new argument
     parser.add_argument("--out_dir", type=str, default="../outputs", 
                         help="Output directory for experiment data.")
 
@@ -336,5 +372,4 @@ if __name__ == "__main__":
     elif args.mode == "dual":
         run_dual_live_webcam(args.baseline)
     elif args.mode == "profile":
-        # Pass the out_dir down to your plotting functions here if needed
-        run_arcface_profiling(args.baseline, frames_per_phase=args.frames, out_dir=args.out_dir)
+        run_physical_profiling(args.baseline, frames_per_phase=args.frames, out_dir=args.out_dir)
