@@ -19,12 +19,10 @@ Adversarial-Glasses/
 │   ├── private/                  # Personal evaluation faces (IGNORED by Git)
 │   └── glasses_template.png      # High-contrast RGBA eyeglass silhouette
 ├── experiments/                  # Unified bash runners for standardized testing
-│   ├── run_experiment_1.sh            
-│   └── run_experiment_2.sh            
-├── notebooks/                    # Prototyping and custom exploratory analyses
+│   ├── 1_optimize_dodging.sh            
+│   └── 2_evaluate_physical.sh
 ├── outputs/                      # Timestamped experiment logs
-├── outputs/                      # Timestamped experiment logs
-│   ├── experiment_20261020_1530/
+│   ├── exp1/
 │   │   ├── dodging_glasses.pdf       # 300 DPI Transparent Vector Export
 │   │   ├── experiment_meta.json      # Hyperparameter logs
 │   │   ├── raw_perturbation.pt       # PyTorch tensor for digital re-simulations
