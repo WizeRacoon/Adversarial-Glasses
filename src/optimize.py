@@ -62,7 +62,7 @@ def main():
 
     # 2. Load Batch Data & Baselines
     clean_faces = load_face_batch(args.data_dir, config.DEVICE)
-    print(f"Successfully loaded and aligned {clean_faces.shape[0]} faces in the batch.") # Add this line
+    print(f"Successfully loaded and aligned {clean_faces.shape[0]} faces in the batch.")
     
     with torch.no_grad():
         baseline_embeddings = resnet(clean_faces).mean(dim=0, keepdim=True)
@@ -95,7 +95,9 @@ def main():
             perturbation.clamp_(0, 1)
 
         if i % 50 == 0:
-            print(f"Iter {i:03d} | Total: {total_loss.item():.4f} | Attack: {loss_attack.item():.4f} | TV: {loss_tv.item():.4f}")
+            # Capitalize the attack flag (e.g., 'dodging' -> 'Dodging', 'impersonation' -> 'Impersonation')
+            attack_label = args.attack.capitalize()
+            print(f"Iter {i:03d} | Joint: {total_loss.item():7.4f} | {attack_label}: {loss_attack.item():7.4f} | TV: {loss_tv.item():9.4f} | NPS: {loss_nps.item():9.4f}")
         
     print("Optimization complete.")
     pdf_path = os.path.join(args.out_dir, f"{args.attack}_glasses.pdf")

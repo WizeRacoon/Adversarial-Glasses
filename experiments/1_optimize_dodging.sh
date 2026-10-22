@@ -4,7 +4,7 @@
 # ---------------------------------------------------------
 # Change this variable to run your different datasets:
 # Options: exp1_single_ideal, exp2_fifty_similar, exp3_fifty_diverse, exp4_single_phone
-EXP_NAME="exp4_25_diverse"
+EXP_NAME="test"
 
 echo "==================================================="
 echo "Starting Phase 1 Optimization for: $EXP_NAME"
