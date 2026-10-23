@@ -12,7 +12,7 @@ The codebase utilizes a modular Command & Dispatch architecture, leaving a struc
 
 ## Repository Structure
 
-![System Architecture](assets/architecture_diagram/Adversarial_Glasses_Architecture_Diagram.pdf)
+![System Architecture](assets/architecture_diagram/Adversarial_Glasses_Architecture_Diagram.png)
 
 ```text
 Adversarial-Glasses/
