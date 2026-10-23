@@ -17,30 +17,30 @@ The codebase utilizes a modular Command & Dispatch architecture, leaving a struc
 ```text
 Adversarial-Glasses/
 ├── data/
-│   ├── sample/                   # Public/stock face images for baseline testing
-│   ├── private/                  # Personal evaluation faces (IGNORED by Git)
-│   └── glasses_template.png      # High-contrast RGBA eyeglass silhouette
-├── experiments/                  # Unified bash runners for standardized testing
+│   ├── sample/                                 # Public/stock face images for baseline testing
+│   ├── private/                                # Personal evaluation faces (IGNORED by Git)
+│   └── glasses_template.png                    # High-contrast RGBA eyeglass silhouette
+├── experiments/                                # Unified bash runners for standardized testing
 │   ├── 1_optimize_dodging.sh            
 │   └── 2_evaluate_physical.sh
-├── outputs/                      # Timestamped experiment logs
+├── outputs/                                    # Timestamped experiment logs
 │   ├── exp1/
-│   │   ├── dodging_glasses.pdf       # 300 DPI Transparent Vector Export
-│   │   ├── experiment_meta.json      # Hyperparameter logs
-│   │   ├── raw_perturbation.pt       # PyTorch tensor for digital re-simulations
-│   │   └── resnet_robustness_boundaries.png
+│   │   ├── dodging_glasses.pdf                 # 300 DPI Transparent Vector Export
+│   │   ├── experiment_meta.json                # Hyperparameter logs
+│   │   ├── raw_perturbation.pt                 # PyTorch tensor for digital re-simulations
+│   │   └── evaluated.csv                       # self-defined sheet of data from physical testing
 │   └── ...
 ├── src/
-│   ├── config.py                 # Pipeline hyperparameters and constants
-│   ├── eot.py                    # Expectation over Transformation augmentations
-│   ├── evaluate.py               # Digital simulation and live webcam testing
-│   ├── losses.py                 # Total Variation, NPS, and Cosine Dodging losses
-│   ├── models.py                 # Model wrappers (InceptionResnetV1, MTCNN, ArcFace)
-│   ├── optimize.py               # Optimization loop and batch driver
-│   ├── plotting.py               # Decoupled matplotlib visualization routines
-│   └── utils.py                  # Masking routines, inpainting, and PDF rendering
+│   ├── config.py                               # Pipeline hyperparameters and constants
+│   ├── eot.py                                  # Expectation over Transformation augmentations
+│   ├── evaluate.py                             # Digital simulation and live webcam testing
+│   ├── losses.py                               # Total Variation, NPS, and Cosine Dodging losses
+│   ├── models.py                               # Model wrappers (InceptionResnetV1, MTCNN, ArcFace)
+│   ├── optimize.py                             # Optimization loop and batch driver
+│   ├── plotting.py                             # Decoupled matplotlib visualization routines
+│   └── utils.py                                # Masking routines, inpainting, and PDF rendering
 ├── .gitignore
-├── EXPERIMENTS.md                # Documentation for running physical tests
+├── EXPERIMENTS.md                              # Documentation for running physical tests
 ├── README.md
 └── requirements.txt
 ```
