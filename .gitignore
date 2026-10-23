@@ -14,9 +14,10 @@ __pycache__/
 *.pdf
 *.png
 
-# EXCEPTIONS: Allow the mask template, sample data, and gitkeeps
+# EXCEPTIONS: Allow the mask template, sample data, assets, and gitkeeps
 !data/glasses_template.png
 !data/sample/*
+!assets/*
 !**/.gitkeep
 
 # Completely ignore folder contents (except gitkeeps)
