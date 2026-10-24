@@ -10,9 +10,7 @@ The primary focus of this internship was establishing a robust framework for **d
 **Future Research Directions**
 The codebase utilizes a modular Command & Dispatch architecture, leaving a structured foundation for future students and subsequent internships to explore. Additionally, all code has been written with potential future prospects in mind, meaning clear naming, documentation and seperation of concerns.
 
-## Repository Structure
-
-![System Architecture](assets/architecture_diagram/Adversarial_Glasses_Architecture_Diagram.png)
+## Repository Structure and Codebase Architecture
 
 ```text
 Adversarial-Glasses/
@@ -44,6 +42,9 @@ Adversarial-Glasses/
 ├── README.md
 └── requirements.txt
 ```
+
+![System Architecture](assets/architecture_diagram/Adversarial_Glasses_Architecture_Diagram.png)
+**Note:** The diagram above illustrates the primary data flow and architectural sequence. Global dependencies and utility imports (such as `evaluate.py` calling `config.py` and `models.py`) are intentionally omitted to maintain visual clarity.
 
 ---
 
