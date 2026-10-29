@@ -22,6 +22,7 @@ __pycache__/
 
 # Completely ignore folder contents (except gitkeeps)
 data/private/*
+src/helpers/*
 !data/private/.gitkeep
 
 outputs/*

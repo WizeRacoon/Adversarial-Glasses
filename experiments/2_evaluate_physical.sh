@@ -2,8 +2,9 @@
 # ---------------------------------------------------------
 # PHASE 2: PHYSICAL LIVE EVALUATION
 # ---------------------------------------------------------
-# Make sure this matches the glasses you are currently wearing!
-EXP_NAME="exp1_single_ideal"
+
+# Make sure this experiment matches the glasses you are currently wearing!
+EXP_NAME="..."
 
 echo "==================================================="
 echo "Starting Phase 2 Evaluation for: $EXP_NAME"
@@ -16,6 +17,9 @@ cd "$(dirname "$0")/../src"
 # to ensure the ArcFace/ResNet similarities are measured on the same scale.
 BASELINE="../data/private/baseline_webcam.jpg"
 OUT_DIR="../outputs/$EXP_NAME"
+
+# Ensure the output directory exists before running
+mkdir -p "$OUT_DIR"
 
 # Run the live profiler. CSV and PNG plots will save alongside the PDF.
 python evaluate.py \

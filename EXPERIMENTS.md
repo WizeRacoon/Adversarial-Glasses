@@ -4,7 +4,7 @@ The `src/evaluate.py` script provides a dedicated Command-Line Interface (CLI) t
 
 ## Prerequisites: Establishing the Baseline
 Before running any live tests, the system needs a baseline embedding of your face to compare against.
-1. Take a clear, well-lit, frontal headshot of the subject **without** glasses.
+1. Take a clear, well-lit, frontal headshot of the subject **without** glasses. Ideally, this image is as close as possible to the average image during the experiment.
 2. Save the image to your data directory (e.g., `data/sample/target.jpg` or `data/private/target.jpg`).
 
 ## Automated Experiment Pipelines (Recommended)
@@ -13,10 +13,12 @@ The easiest way to run a full end-to-end experiment (optimization + evaluation +
 
 ```bash
 # Run from the root of the repository
-./experiments/run_dodging.sh
+./experiments/1_optimize_dodging.sh
+# Physically Print generated eyeglasses pattern
+./experiments/2_optimize_dodging.sh
 ```
 * **Phase 1:** Optimizes the adversarial glasses against the batched faces in your data directory.
-* **Phase 2:** Automatically launches the live ArcFace robustness profiler and saves the resulting CSV and trend plots into the timestamped experiment folder.
+* **Phase 2:** Automatically launches the live robustness profiler and saves the resulting CSV and trend plots into the timestamped experiment folder.
 
 ---
 

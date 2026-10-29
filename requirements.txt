@@ -12,6 +12,7 @@ onnxruntime
 opencv-python
 pillow
 matplotlib
+seaborn
 
 # Notebook environment (for the notebooks/ folder)
 jupyterlab

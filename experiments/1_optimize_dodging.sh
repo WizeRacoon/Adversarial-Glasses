@@ -2,9 +2,8 @@
 # ---------------------------------------------------------
 # PHASE 1: DIGITAL OPTIMIZATION
 # ---------------------------------------------------------
-# Change this variable to run your different datasets:
-# Options: exp1_single_ideal, exp2_fifty_similar, exp3_fifty_diverse, exp4_single_phone
-EXP_NAME="test"
+
+EXP_NAME="..."
 
 echo "==================================================="
 echo "Starting Phase 1 Optimization for: $EXP_NAME"

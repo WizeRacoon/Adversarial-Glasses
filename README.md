@@ -2,13 +2,13 @@
 
 This repository serves as the codebase for an MSc research project focusing on physical adversarial evasion attacks against state-of-the-art Face Recognition Systems (FRSs). Building upon the foundational research of Sharif et al. in *"Accessorize to a Crime: Real and Stealthy Attacks on State-of-the-Art Face Recognition"*, this project reproduces, modernizes, and extends the physical realization of adversarial eyeglass frames. 
 
-The repository provides a complete, differentiable pipeline for optimizing printable adversarial textures. It actively integrates Expectation over Transformation (EoT), Total Variation (TV) constraints, and a Non-Printability Score (NPS) to bridge the digital-to-physical performance gap.
+The repository provides a complete, differentiable pipeline for optimizing printable adversarial textures. It actively integrates Expectation over Transformation (EoT), Total Variation (TV) constraints, and a Non-Printability Score (NPS) to aim to bridge the digital-to-physical performance gap.
 
 **Current Scope & Completed Objectives**
-The primary focus of this internship was establishing a robust framework for **dodging** (untargeted evasion). The pipeline tries to maximize real-world physical robustness through implemented multi-image batching across diverse lighting conditions and poses to prevent spatial overfitting and ensure reliable evasion in the physical domain.
+The primary focus of this internship was establishing a robust framework for **dodging** (untargeted evasion). The pipeline tries to maximize real-world physical robustness through implemented multi-image batching across diverse lighting conditions and poses to prevent spatial overfitting and ensures consistent evasion in the physical domain.
 
 **Future Research Directions**
-The codebase utilizes a modular Command & Dispatch architecture, leaving a structured foundation for future students and subsequent internships to explore. Additionally, all code has been written with potential future prospects in mind, meaning clear naming, documentation and seperation of concerns.
+The codebase utilizes a modular Command & Dispatch architecture, leaving a strong foundation for future students and subsequent internships to explore. Additionally, all code has been written with potential future prospects in mind, meaning clear naming, documentation and seperation of concerns.
 
 ## Repository Structure and Codebase Architecture
 
@@ -26,8 +26,8 @@ Adversarial-Glasses/
 │   │   ├── dodging_glasses.pdf                 # 300 DPI Transparent Vector Export
 │   │   ├── experiment_meta.json                # Hyperparameter logs
 │   │   ├── raw_perturbation.pt                 # PyTorch tensor for digital re-simulations
-│   │   └── evaluated.csv                       # self-defined sheet of data from physical testing
-│   └── ...
+│   │   └── dual_robustness.csv                 # Data on physical testing performance Resnet and Arcface
+│   └── exp2/
 ├── src/
 │   ├── config.py                               # Pipeline hyperparameters and constants
 │   ├── eot.py                                  # Expectation over Transformation augmentations
